@@ -30,3 +30,9 @@
 *.exe
 *.out
 *.app
+CMakeCache.txt
+CMakeFiles
+MakeFile
+calc
+cmake_install.cmake
+treeview

@@ -3,6 +3,10 @@ cmake_minimum_required (VERSION 3.8)
 set(NAME treeview)
 project (${NAME})
 
+set(TELEX_PATH $ENV{TELEX_DIR})
+find_package (telex REQUIRED PATHS ${TELEX_PATH})
+include(${TELEX_PATH}/scripts/addResource.cmake_script)
+
 add_compile_options(-DNOFS)
 
 if(NOT MSVC AND (NOT APPLE) AND (NOT  UNIX))
@@ -12,12 +16,9 @@ endif()
 set(CMAKE_CXX_STANDARD 17)
 
 include_directories(
-     ../../telexlib/include
+     ${TELEX_PATH}/telexlib/include
     include
     )
-
-
-find_package (telex REQUIRED PATHS ../..)
 
 
 add_executable(${PROJECT_NAME}
