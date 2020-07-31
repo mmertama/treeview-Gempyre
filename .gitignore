@@ -36,3 +36,6 @@ MakeFile
 calc
 cmake_install.cmake
 treeview
+builds
+*.text.user
+CMakeLists.txt.user

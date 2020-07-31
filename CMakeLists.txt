@@ -3,9 +3,9 @@ cmake_minimum_required (VERSION 3.8)
 set(NAME treeview)
 project (${NAME})
 
-set(TELEX_PATH $ENV{TELEX_DIR})
-find_package (telex REQUIRED PATHS ${TELEX_PATH})
-include(${TELEX_PATH}/scripts/addResource.cmake_script)
+set(GEMPYRE_PATH $ENV{GEMPYRE_DIR})
+find_package (gempyre REQUIRED PATHS ${GEMPYRE_PATH})
+include(${GEMPYRE_PATH}/scripts/addResource.cmake_script)
 
 add_compile_options(-DNOFS)
 
@@ -16,7 +16,7 @@ endif()
 set(CMAKE_CXX_STANDARD 17)
 
 include_directories(
-     ${TELEX_PATH}/telexlib/include
+     ${GEMPYRE_PATH}/gempyrelib/include
     include
     )
 
@@ -28,6 +28,6 @@ add_executable(${PROJECT_NAME}
 
 addResource(PROJECT ${PROJECT_NAME} TARGET include/${NAME}_resource.h SOURCES gui/${NAME}.html gui/tree.css gui/favicon.ico)
 	
-target_link_libraries (${PROJECT_NAME} telex)
+target_link_libraries (${PROJECT_NAME} gempyre)
 
 

@@ -1,2 +1,2 @@
-# treeview-Telex
-File Viewer using Telex
+# treeview-Gempyre
+File Viewer using Gempyre

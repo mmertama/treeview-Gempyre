@@ -1,6 +1,6 @@
-#include <telex.h>
+#include <gempyre.h>
 #include "treeview_resource.h"
-#include <telex_utils.h>
+#include <gempyre_utils.h>
 #include <vector>
 #include <tuple>
 #include <set>
@@ -21,9 +21,9 @@ const std::string fileClass {"file tree"};
 
 Entries readdir(const std::string& dir, bool showHidden) {
     Entries entries;
-    for(const auto& [path, isDir, link]: TelexUtils::directory(dir)) {
+    for(const auto& [path, isDir, link]: GempyreUtils::directory(dir)) {
         (void) link;
-        if(path != "." && path != ".." && (showHidden || !TelexUtils::isHiddenEntry(dir + "/" + path)))
+        if(path != "." && path != ".." && (showHidden || !GempyreUtils::isHiddenEntry(dir + "/" + path)))
             entries.emplace_back(path, isDir);
     }
     std::sort(entries.begin(), entries.end(), [](const auto& a, const auto& b){return std::get<0>(a) < std::get<0>(b);});
@@ -34,19 +34,19 @@ std::string decoderate(const std::string& str, const std::string dec) {
     return "<" + dec + ">" + str + "</" + dec + ">";
 }
 
-Telex::Element addDir(Telex::Ui& ui, Telex::Element& root, const std::string& rootnamec, State& openDirs, bool showHidden) {
+Gempyre::Element addDir(Gempyre::Ui& ui, Gempyre::Element& root, const std::string& rootnamec, State& openDirs, bool showHidden) {
     const auto rootname = rootnamec.back() != '/' ? rootnamec + '/' : rootnamec;
     const auto childs = readdir(rootname, showHidden);
-    auto parent = Telex::Element(ui, rootname + "_ul", "UL", root);
+    auto parent = Gempyre::Element(ui, rootname + "_ul", "UL", root);
     parent.setAttribute("class", "tree");
     for(const auto& c : childs) {
         const auto isDir = std::get<1>(c);
         const auto basename = std::get<0>(c);
         const auto fullname = rootname + basename + (isDir ? "/" : "");
-        const auto id = TelexUtils::substitute(fullname, " ", "_");
-        auto current = Telex::Element(ui, id, "LI", parent)
-            .subscribe("click", [&ui, root, &openDirs, showHidden, fullname, basename] (const Telex::Event& ev) {
-                Telex::Element el(ev.element);
+        const auto id = GempyreUtils::substitute(fullname, " ", "_");
+        auto current = Gempyre::Element(ui, id, "LI", parent)
+            .subscribe("click", [&ui, root, &openDirs, showHidden, fullname, basename] (const Gempyre::Event& ev) {
+                Gempyre::Element el(ev.element);
                 const auto attVal = el.attributes();
                 if(attVal.has_value()) {
                     const auto att = attVal.value();
@@ -87,15 +87,15 @@ Telex::Element addDir(Telex::Ui& ui, Telex::Element& root, const std::string& ro
 }
 
 int main(int argc, char** argv) {
-	Telex::setDebug();
-    Telex::Ui ui({{"/treeview.html", Treeviewhtml}, {"/tree.css", Treecss}, {"/favicon.ico", Faviconico}}, "treeview.html");
+    Gempyre::setDebug();
+    Gempyre::Ui ui({{"/treeview.html", Treeviewhtml}, {"/tree.css", Treecss}, {"/favicon.ico", Faviconico}}, "treeview.html");
     const std::string root = argc > 1 ? argv[1]  :
 #ifdef WINDOWS_OS
 	"C:/";
 #else
 	"/";
 #endif
-    Telex::Element holdingElement(ui, "treeview");
+    Gempyre::Element holdingElement(ui, "treeview");
     State openPages; //here we store the state or UI, it keeps track on opened folders and restored as needed
     auto showHidden = false;
 
@@ -103,8 +103,8 @@ int main(int argc, char** argv) {
 
     reload = [&ui, &reload, &openPages, root, holdingElement, &showHidden]() mutable { //this function constructs the ui
          auto rootElement = addDir(ui, holdingElement, root, openPages, showHidden);
-         Telex::Element(ui, "name").setHTML(TelexUtils::hostName());
-         Telex::Element(ui, "hiddenbox").subscribe("checked", [&reload, &showHidden, rootElement](const Telex::Event& el) mutable {
+         Gempyre::Element(ui, "name").setHTML(GempyreUtils::hostName());
+         Gempyre::Element(ui, "hiddenbox").subscribe("checked", [&reload, &showHidden, rootElement](const Gempyre::Event& el) mutable {
              const auto values = el.element.values();
              if(values.has_value()) {
                  const auto bstr = values.value().at("checked");
