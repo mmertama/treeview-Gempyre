@@ -39,3 +39,4 @@ treeview
 builds
 *.text.user
 CMakeLists.txt.user
+build
