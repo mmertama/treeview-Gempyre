@@ -14,6 +14,10 @@ endif()
 
 set(CMAKE_CXX_STANDARD 17)
 
+if(USE_CONFIG)
+    set(CONFIG_FILE gempyre.conf)
+endif()
+
 include_directories(
     include
     )
@@ -24,7 +28,7 @@ add_executable(${PROJECT_NAME}
     gui/${NAME}.html
     )
 
-addResource(PROJECT ${PROJECT_NAME} TARGET include/${NAME}_resource.h SOURCES gui/${NAME}.html gui/tree.css gui/favicon.ico)
+addResource(PROJECT ${PROJECT_NAME} TARGET include/${NAME}_resource.h SOURCES gui/${NAME}.html gui/tree.css gui/favicon.ico ${CONFIG_FILE})
 	
 target_link_libraries (${PROJECT_NAME} gempyre::gempyre)
 

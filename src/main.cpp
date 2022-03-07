@@ -21,10 +21,11 @@ const std::string fileClass {"file tree"};
 
 Entries readdir(const std::string& dir, bool showHidden) {
     Entries entries;
-    for(const auto& [path, isDir, link]: GempyreUtils::directory(dir)) {
-        (void) link;
-        if(path != "." && path != ".." && (showHidden || !GempyreUtils::isHiddenEntry(dir + "/" + path)))
-            entries.emplace_back(path, isDir);
+    for(const auto& name : GempyreUtils::directory(dir)) {
+        const auto full_name = GempyreUtils::pushPath(dir, name);
+        if(name != "." && name != ".." && (showHidden ||
+                                                     !GempyreUtils::isHiddenEntry(full_name)))
+            entries.emplace_back(name, GempyreUtils::isDir(full_name));
     }
     std::sort(entries.begin(), entries.end(), [](const auto& a, const auto& b){return std::get<0>(a) < std::get<0>(b);});
     return entries;
@@ -88,7 +89,7 @@ Gempyre::Element addDir(Gempyre::Ui& ui, Gempyre::Element& root, const std::stri
 
 int main(int argc, char** argv) {
     Gempyre::setDebug();
-    Gempyre::Ui ui({{"/treeview.html", Treeviewhtml}, {"/tree.css", Treecss}, {"/favicon.ico", Faviconico}}, "treeview.html");
+    Gempyre::Ui ui(Treeview_resourceh, "treeview.html");
     const std::string root = argc > 1 ? argv[1]  :
 #ifdef WINDOWS_OS
 	"C:/";
