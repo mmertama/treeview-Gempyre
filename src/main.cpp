@@ -21,10 +21,10 @@ const std::string fileClass {"file tree"};
 
 Entries readdir(const std::string& dir, bool showHidden) {
     Entries entries;
-    for(const auto& [path, isDir, link]: GempyreUtils::directory(dir)) {
-        (void) link;
-        if(path != "." && path != ".." && (showHidden || !GempyreUtils::isHiddenEntry(dir + "/" + path)))
-            entries.emplace_back(path, isDir);
+    for(const auto& path: GempyreUtils::directory(dir)) {
+        const auto fullname = dir + "/" + path;
+        if(path != "." && path != ".." && (showHidden || !GempyreUtils::is_hidden_entry(fullname)))
+            entries.emplace_back(path, GempyreUtils::is_dir(fullname));
     }
     std::sort(entries.begin(), entries.end(), [](const auto& a, const auto& b){return std::get<0>(a) < std::get<0>(b);});
     return entries;
@@ -38,7 +38,7 @@ Gempyre::Element addDir(Gempyre::Ui& ui, Gempyre::Element& root, const std::stri
     const auto rootname = rootnamec.back() != '/' ? rootnamec + '/' : rootnamec;
     const auto childs = readdir(rootname, showHidden);
     auto parent = Gempyre::Element(ui, rootname + "_ul", "UL", root);
-    parent.setAttribute("class", "tree");
+    parent.set_attribute("class", "tree");
     for(const auto& c : childs) {
         const auto isDir = std::get<1>(c);
         const auto basename = std::get<0>(c);
@@ -54,7 +54,7 @@ Gempyre::Element addDir(Gempyre::Ui& ui, Gempyre::Element& root, const std::stri
 
                         const auto path = att.find("name")->second;
                         addDir(ui, el, path, openDirs, showHidden);
-                        el.setAttribute("class", openClass);
+                        el.set_attribute("class", openClass);
                         openDirs.emplace(el.id(), path);
                     } else if(att.find("class")->second == openClass) {
                         const auto childrenVal = el.children();
@@ -64,22 +64,22 @@ Gempyre::Element addDir(Gempyre::Ui& ui, Gempyre::Element& root, const std::stri
                                 const auto a = e.attributes();
                                 e.remove();
                             }
-                            el.setAttribute("class", closeClass);
+                            el.set_attribute("class", closeClass);
                             auto it = openDirs.find(std::make_tuple(el.id(), ""));
                             if(it != openDirs.end())
                                 openDirs.erase(it);
                         }
                     } else { //file
-                            ui.open(ui.addressOf(fullname), basename);
+                            ui.open(ui.address_of(fullname), basename);
                     }
                 }
             })
-            .setAttribute("class", isDir ? closeClass : fileClass)
-            .setAttribute("name", fullname)
-            .setHTML(isDir ? basename : basename);
+            .set_attribute("class", isDir ? closeClass : fileClass)
+            .set_attribute("name", fullname)
+            .set_html(isDir ? basename : basename);
              auto it = openDirs.find(std::make_tuple(id, ""));
              if(it != openDirs.end()) {
-                 current.setAttribute("class", openClass);
+                 current.set_attribute("class", openClass);
                  addDir(ui, current, std::get<1>(*it), openDirs, showHidden);
              }
     }
@@ -87,7 +87,7 @@ Gempyre::Element addDir(Gempyre::Ui& ui, Gempyre::Element& root, const std::stri
 }
 
 int main(int argc, char** argv) {
-    Gempyre::setDebug();
+    Gempyre::set_debug();
     Gempyre::Ui ui({{"/treeview.html", Treeviewhtml}, {"/tree.css", Treecss}, {"/favicon.ico", Faviconico}}, "treeview.html");
     const std::string root = argc > 1 ? argv[1]  :
 #ifdef WINDOWS_OS
@@ -103,7 +103,7 @@ int main(int argc, char** argv) {
 
     reload = [&ui, &reload, &openPages, root, holdingElement, &showHidden]() mutable { //this function constructs the ui
          auto rootElement = addDir(ui, holdingElement, root, openPages, showHidden);
-         Gempyre::Element(ui, "name").setHTML(GempyreUtils::hostName());
+         Gempyre::Element(ui, "name").set_html(GempyreUtils::host_name());
          Gempyre::Element(ui, "hiddenbox").subscribe("checked", [&reload, &showHidden, rootElement](const Gempyre::Event& el) mutable {
              const auto values = el.element.values();
              if(values.has_value()) {
@@ -117,7 +117,7 @@ int main(int argc, char** argv) {
 
     reload(); //intial load
 
-    ui.onReload(reload);
+    ui.on_reload(reload);
    // ui.onUiExit(nullptr);
     ui.run();
 }
