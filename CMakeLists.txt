@@ -4,7 +4,7 @@ set(NAME treeview)
 project (${NAME})
 
 find_package (gempyre REQUIRED)
-include(addResource)
+include(gempyre)
 
 add_compile_options(-DNOFS)
 
@@ -24,7 +24,7 @@ add_executable(${PROJECT_NAME}
     gui/${NAME}.html
     )
 
-addResource(PROJECT ${PROJECT_NAME} TARGET include/${NAME}_resource.h SOURCES gui/${NAME}.html gui/tree.css gui/favicon.ico)
+gempyre_add_resources(PROJECT ${PROJECT_NAME} TARGET include/${NAME}_resource.h SOURCES gui/${NAME}.html gui/tree.css gui/favicon.ico)
 	
 target_link_libraries (${PROJECT_NAME} gempyre::gempyre)
 
